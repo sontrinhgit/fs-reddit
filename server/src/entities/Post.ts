@@ -26,4 +26,7 @@ export class Post extends BaseEntity {
     @Field(_type => Date)
     @CreateDateColumn()
     updatedAt: Date | undefined
+
+
+
 }

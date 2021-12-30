@@ -26,6 +26,7 @@ const type_graphql_1 = require("type-graphql");
 const Post_1 = require("../entities/Post");
 const CreatePostInput_1 = require("../types/CreatePostInput");
 const PostMutationResponse_1 = require("../types/PostMutationResponse");
+const updatePostInput_1 = require("../types/updatePostInput");
 let PostResolver = class PostResolver {
     createPost({ title, text }) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -51,6 +52,81 @@ let PostResolver = class PostResolver {
             }
         });
     }
+    posts() {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                return Post_1.Post.find();
+            }
+            catch (err) {
+                return null;
+            }
+        });
+    }
+    post(id) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                return yield Post_1.Post.findOne(id);
+            }
+            catch (error) {
+                return undefined;
+            }
+        });
+    }
+    updatePost({ id, title, text }) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                const existingPost = yield Post_1.Post.findOne(id);
+                if (!existingPost)
+                    return {
+                        code: 400,
+                        success: false,
+                        message: 'Post not found'
+                    };
+                existingPost.title = title;
+                existingPost.text = text;
+                yield existingPost.save();
+                return {
+                    code: 200,
+                    success: true,
+                    message: 'update successfully',
+                    post: existingPost
+                };
+            }
+            catch (_a) {
+                return {
+                    code: 500,
+                    success: false,
+                    message: `Internal server error`,
+                };
+            }
+        });
+    }
+    deletePost(id) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                const existingPost = yield Post_1.Post.findOne(id);
+                if (!existingPost)
+                    return {
+                        code: 400,
+                        success: false,
+                        message: 'Post not found'
+                    };
+                yield Post_1.Post.delete({ id }); //tham so id ma can delete se bang id cua id truyen vao 
+                return {
+                    code: 200,
+                    success: true,
+                    message: 'Post deleted successfully'
+                };
+            }
+            catch (error) {
+                return {
+                    code: 500,
+                    success: false,
+                    message: `Internal server error`,
+                };
+            }
+        });
+    }
 };
 __decorate([
     (0, type_graphql_1.Mutation)(_return => PostMutationResponse_1.PostMutationResponse),
@@ -59,6 +135,33 @@ __decorate([
     __metadata("design:paramtypes", [CreatePostInput_1.CreatePostInput]),
     __metadata("design:returntype", Promise)
 ], PostResolver.prototype, "createPost", null);
+__decorate([
+    (0, type_graphql_1.Query)(_return => [Post_1.Post], { nullable: true }),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", []),
+    __metadata("design:returntype", Promise)
+], PostResolver.prototype, "posts", null);
+__decorate([
+    (0, type_graphql_1.Query)(_return => Post_1.Post, { nullable: true }),
+    __param(0, (0, type_graphql_1.Arg)('id')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Number]),
+    __metadata("design:returntype", Promise)
+], PostResolver.prototype, "post", null);
+__decorate([
+    (0, type_graphql_1.Mutation)(_return => PostMutationResponse_1.PostMutationResponse),
+    __param(0, (0, type_graphql_1.Arg)('updatePostInput')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [updatePostInput_1.UpdatePostInput]),
+    __metadata("design:returntype", Promise)
+], PostResolver.prototype, "updatePost", null);
+__decorate([
+    (0, type_graphql_1.Mutation)(_return => PostMutationResponse_1.PostMutationResponse),
+    __param(0, (0, type_graphql_1.Arg)('id')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Number]),
+    __metadata("design:returntype", Promise)
+], PostResolver.prototype, "deletePost", null);
 PostResolver = __decorate([
     (0, type_graphql_1.Resolver)()
 ], PostResolver);

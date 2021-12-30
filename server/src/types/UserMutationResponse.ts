@@ -11,7 +11,7 @@ export class UserMutationResponse implements IMutationResponse {
 
     @Field({nullable: true}) 
     user?: User
-    
+ 
     @Field(_type =>[FieldError], {nullable: true }) //day la ngon ngu cua graphql 
     errors?: FieldError[]
 }
