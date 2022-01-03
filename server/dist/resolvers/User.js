@@ -62,7 +62,7 @@ let UserResolver = class UserResolver {
                 let newUser = User_1.User.create({
                     username,
                     password: hashedPassword,
-                    email
+                    email,
                 });
                 yield User_1.User.save(newUser);
                 //phai dat newUser len truoc de newUser co id thi moi lay duoc id do
@@ -71,7 +71,7 @@ let UserResolver = class UserResolver {
                     code: 200,
                     success: true,
                     message: "User registration successfully",
-                    user: newUser
+                    user: newUser,
                 };
             }
             catch (error) {
@@ -84,7 +84,7 @@ let UserResolver = class UserResolver {
         });
     }
     login({ usernameOrEmail, password }, 
-    //ctx chinh la context, lay req va res tu context o apolloserver 
+    //ctx chinh la context, lay req va res tu context o apolloserver
     { req }) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
@@ -111,14 +111,14 @@ let UserResolver = class UserResolver {
                         message: "Wrong password",
                         errors: [{ field: "password", message: "Incorrect password" }],
                     };
-                //create Session and then return cookie anytime have one user login successfully 
-                //userId of session that was created in Context file 
+                //create Session and then return cookie anytime have one user login successfully
+                //userId of session that was created in Context file
                 req.session.userId = existingUser.id;
                 return {
                     code: 200,
                     success: true,
                     message: "Login successfully",
-                    user: existingUser
+                    user: existingUser,
                 };
             }
             catch (error) {
@@ -132,16 +132,17 @@ let UserResolver = class UserResolver {
         });
     }
     logout({ req, res }) {
-        return __awaiter(this, void 0, void 0, function* () {
-            //de gach chan o duoi reject do minh k can toi no 
-            //phai dat no vao mo promise vi trong ham destroy yeu cau mot callback 
-            return new Promise((resolve, _reject) => {
-                res.clearCookie(constant_1.COOKIE_NAME);
-                req.session.destroy(error => {
-                    console.log(' DESTROY SESSION ERROR', error);
+        //de gach chan o duoi reject do minh k can toi no
+        //phai dat no vao mo promise vi trong ham destroy yeu cau mot callback
+        return new Promise((resolve, _reject) => {
+            res.clearCookie(constant_1.COOKIE_NAME);
+            req.session.destroy((error) => {
+                if (error) {
+                    console.log(" DESTROY SESSION ERROR", error);
                     resolve(false);
-                });
+                }
                 resolve(true);
+                console.log('Finish logout');
             });
         });
     }
@@ -163,7 +164,7 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], UserResolver.prototype, "login", null);
 __decorate([
-    (0, type_graphql_1.Mutation)(_returns => Boolean),
+    (0, type_graphql_1.Mutation)((_returns) => Boolean),
     __param(0, (0, type_graphql_1.Ctx)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [Object]),

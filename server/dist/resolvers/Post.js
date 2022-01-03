@@ -101,30 +101,22 @@ let PostResolver = class PostResolver {
             }
         });
     }
-    deletePost(id) {
+    deletePost(id, { req }) {
         return __awaiter(this, void 0, void 0, function* () {
-            try {
-                const existingPost = yield Post_1.Post.findOne(id);
-                if (!existingPost)
-                    return {
-                        code: 400,
-                        success: false,
-                        message: 'Post not found'
-                    };
-                yield Post_1.Post.delete({ id }); //tham so id ma can delete se bang id cua id truyen vao 
+            console.log('Request session', req.session);
+            const existingPost = yield Post_1.Post.findOne(id);
+            if (!existingPost)
                 return {
-                    code: 200,
-                    success: true,
-                    message: 'Post deleted successfully'
-                };
-            }
-            catch (error) {
-                return {
-                    code: 500,
+                    code: 400,
                     success: false,
-                    message: `Internal server error`,
+                    message: 'Post not found'
                 };
-            }
+            yield Post_1.Post.delete({ id }); //tham so id ma can delete se bang id cua id truyen vao 
+            return {
+                code: 200,
+                success: true,
+                message: 'Post deleted successfully'
+            };
         });
     }
 };
@@ -158,8 +150,9 @@ __decorate([
 __decorate([
     (0, type_graphql_1.Mutation)(_return => PostMutationResponse_1.PostMutationResponse),
     __param(0, (0, type_graphql_1.Arg)('id')),
+    __param(1, (0, type_graphql_1.Ctx)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Number]),
+    __metadata("design:paramtypes", [Number, Object]),
     __metadata("design:returntype", Promise)
 ], PostResolver.prototype, "deletePost", null);
 PostResolver = __decorate([

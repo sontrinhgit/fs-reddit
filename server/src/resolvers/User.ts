@@ -13,10 +13,8 @@ export class UserResolver {
   @Mutation((_returns) => UserMutationResponse, { nullable: true })
   async register(
     @Arg("registerInput") registerInput: RegisterInput,
-    @Ctx() {req,res}:Context
-  ): Promise<UserMutationResponse> 
-  
-  {
+    @Ctx() { req, res }: Context
+  ): Promise<UserMutationResponse> {
     const validateRegisterInputErrors = validateRegisterInput(registerInput);
 
     if (validateRegisterInputErrors !== null)
@@ -51,19 +49,18 @@ export class UserResolver {
       let newUser = User.create({
         username,
         password: hashedPassword,
-        email
+        email,
       });
 
-      
-      await User.save(newUser)
+      await User.save(newUser);
       //phai dat newUser len truoc de newUser co id thi moi lay duoc id do
-      req.session.userId = newUser.id
-      
+      req.session.userId = newUser.id;
+
       return {
         code: 200,
         success: true,
         message: "User registration successfully",
-        user: newUser
+        user: newUser,
       };
     } catch (error) {
       return {
@@ -77,9 +74,8 @@ export class UserResolver {
   @Mutation((_return) => UserMutationResponse)
   async login(
     @Arg("loginInput") { usernameOrEmail, password }: LoginInput,
-    //ctx chinh la context, lay req va res tu context o apolloserver 
-    @Ctx() {req}: Context
-
+    //ctx chinh la context, lay req va res tu context o apolloserver
+    @Ctx() { req }: Context
   ): Promise<UserMutationResponse> {
     try {
       const existingUser = await User.findOne(
@@ -113,17 +109,16 @@ export class UserResolver {
           errors: [{ field: "password", message: "Incorrect password" }],
         };
 
-        //create Session and then return cookie anytime have one user login successfully 
+      //create Session and then return cookie anytime have one user login successfully
 
-        //userId of session that was created in Context file 
-        req.session.userId = existingUser.id
-
+      //userId of session that was created in Context file
+      req.session.userId = existingUser.id;
 
       return {
         code: 200,
         success: true,
         message: "Login successfully",
-        user: existingUser
+        user: existingUser,
       };
     } catch (error) {
       console.log(error);
@@ -135,18 +130,20 @@ export class UserResolver {
     }
   }
 
-  @Mutation(_returns => Boolean)
-  async logout (@Ctx() {req,res}:Context) : Promise<boolean> {
-      //de gach chan o duoi reject do minh k can toi no 
-      //phai dat no vao mo promise vi trong ham destroy yeu cau mot callback 
-      return new Promise((resolve, _reject)  => {
-        res.clearCookie(COOKIE_NAME)
-        req.session.destroy(error => {
-            console.log(' DESTROY SESSION ERROR', error)
-            resolve(false)
-        })
-        resolve(true)
-      } )
-   
+  @Mutation((_returns) => Boolean)
+  logout(@Ctx() { req, res }: Context): Promise<boolean> {
+    //de gach chan o duoi reject do minh k can toi no
+    //phai dat no vao mo promise vi trong ham destroy yeu cau mot callback
+    return new Promise((resolve, _reject) => {
+      res.clearCookie(COOKIE_NAME);
+      req.session.destroy((error) => {
+        if (error) {
+          console.log(" DESTROY SESSION ERROR", error);
+          resolve(false);
+        }
+        resolve(true);
+        console.log('Finish logout')
+      });
+    });
   }
 }

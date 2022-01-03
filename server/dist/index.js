@@ -49,7 +49,7 @@ const main = () => __awaiter(void 0, void 0, void 0, function* () {
             maxAge: 1000 * 60 * 60,
             httpOnly: true,
             secure: constant_1.__prod__,
-            sameSite: 'lax', //protection against CSRF
+            sameSite: 'none', //protection against CSRF
         },
         secret: process.env.SESSION_SECRET_DEV_PROD,
         saveUninitialized: false,
@@ -64,8 +64,8 @@ const main = () => __awaiter(void 0, void 0, void 0, function* () {
         context: ({ req, res }) => ({ req, res })
     });
     yield apolloServer.start();
-    apolloServer.applyMiddleware({ app, cors: true });
+    apolloServer.applyMiddleware({ app, cors: false });
     const PORT = process.env.PORT || 4000;
-    app.listen(4000, () => console.log(`Server run on port ${PORT}. GraphQL server started on localhost:${PORT}${apolloServer.graphqlPath}`));
+    app.listen(PORT, () => console.log(`Server run on port ${PORT}. GraphQL server started on localhost:${PORT}${apolloServer.graphqlPath}`));
 });
 main().catch(error => console.log(error));

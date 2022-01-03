@@ -1,8 +1,11 @@
-import { Arg, ID, Mutation, Query, Resolver } from "type-graphql";
+import { Arg, Ctx, ID, Mutation, Query, Resolver, UseMiddleware } from "type-graphql";
 import { Post } from '../entities/Post';
 import { CreatePostInput } from "../types/CreatePostInput";
 import { PostMutationResponse } from '../types/PostMutationResponse';
 import { UpdatePostInput } from '../types/updatePostInput';
+import { checkAuth } from '../middleware/checkAuth';
+import { Context } from "../types/Context";
+import { AuthenticationError } from "apollo-server-core";
 
 
 @Resolver()
@@ -89,8 +92,13 @@ export class PostResolver {
     }
 
     @Mutation(_return => PostMutationResponse)
-    async deletePost(@Arg('id') id:number) : Promise<PostMutationResponse> {
-        try {
+    //where want to use MiddleWare to check just need to add Middleware
+    //vai tro nhu bac bao ve, kiem tra xem nguoi dung da dang nhap hay chua thong qua session
+    // @UseMiddleware(checkAuth)
+    async deletePost(@Arg('id') id:number, @Ctx() {req}: Context) : Promise<PostMutationResponse> {
+
+        console.log('Request session', req.session)
+
             const existingPost = await Post.findOne(id)
             if(!existingPost)
             return {
@@ -105,13 +113,7 @@ export class PostResolver {
                 success: true,
                 message: 'Post deleted successfully'
             }
-        } catch(error) {
-            return {
-                code: 500,
-                success: false,
-                message: `Internal server error`,
-            }
-        }
+        
     }
 }
 

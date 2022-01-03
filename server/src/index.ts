@@ -46,30 +46,34 @@ const main = async () => {
             maxAge: 1000 * 60 * 60, //one hour
             httpOnly: true, //JS frondend can not access the cookie
             secure: __prod__ ,    //cookie only works in HTTPS
-            sameSite: 'lax' ,//protection against CSRF
+            sameSite: 'none' ,//protection against CSRF
 
         },
         secret: process.env.SESSION_SECRET_DEV_PROD as string,
         saveUninitialized: false, //dont save empty session, right from the start //khi nao login thi moi save session 
         resave: false
+        
     }))
 
 
     const apolloServer = new ApolloServer({
         //trong build Schema thi se dien vao chung cai resolver ma ta da dang ki 
+        
         schema: await buildSchema({
             resolvers: [HelloResolver, UserResolver, PostResolver],
-            validate: false 
+            validate: false
+            
         }),
         context: ({ req, res }): Context => ({req,res})
+        
     })
 
     await apolloServer.start()
 
-    apolloServer.applyMiddleware({app, cors: true})
+    apolloServer.applyMiddleware({app, cors: false})
 
     const PORT = process.env.PORT || 4000
-    app.listen(4000, () => console.log(`Server run on port ${PORT}. GraphQL server started on localhost:${PORT}${apolloServer.graphqlPath}` ))
+    app.listen(PORT, () => console.log(`Server run on port ${PORT}. GraphQL server started on localhost:${PORT}${apolloServer.graphqlPath}` ))
 }
 
 main().catch(error => console.log(error))
