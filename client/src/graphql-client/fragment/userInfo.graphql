@@ -1,0 +1,7 @@
+# tach boc cho cac component cua login va register 
+
+fragment userInfo on User {
+    id 
+    username
+    email
+}

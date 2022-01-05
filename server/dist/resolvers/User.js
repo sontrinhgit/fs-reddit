@@ -34,6 +34,15 @@ const validateRegisterInput_1 = require("../utils/validateRegisterInput");
 const LoginInput_1 = require("../types/LoginInput");
 const constant_1 = require("../constant");
 let UserResolver = class UserResolver {
+    //check the user have login or not
+    me({ req }) {
+        return __awaiter(this, void 0, void 0, function* () {
+            if (!req.session.userId)
+                return null;
+            const user = yield User_1.User.findOne(req.session.userId);
+            return user;
+        });
+    }
     //String nay la String cua graphQL
     register(registerInput, { req, res }) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -142,13 +151,20 @@ let UserResolver = class UserResolver {
                     resolve(false);
                 }
                 resolve(true);
-                console.log('Finish logout');
+                console.log("Finish logout");
             });
         });
     }
 };
 __decorate([
-    (0, type_graphql_1.Mutation)((_returns) => UserMutationResponse_1.UserMutationResponse, { nullable: true }),
+    (0, type_graphql_1.Query)((_return) => User_1.User, { nullable: true }),
+    __param(0, (0, type_graphql_1.Ctx)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object]),
+    __metadata("design:returntype", Promise)
+], UserResolver.prototype, "me", null);
+__decorate([
+    (0, type_graphql_1.Mutation)((_return) => UserMutationResponse_1.UserMutationResponse, { nullable: true }),
     __param(0, (0, type_graphql_1.Arg)("registerInput")),
     __param(1, (0, type_graphql_1.Ctx)()),
     __metadata("design:type", Function),
@@ -164,7 +180,7 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], UserResolver.prototype, "login", null);
 __decorate([
-    (0, type_graphql_1.Mutation)((_returns) => Boolean),
+    (0, type_graphql_1.Mutation)((_return) => Boolean),
     __param(0, (0, type_graphql_1.Ctx)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [Object]),

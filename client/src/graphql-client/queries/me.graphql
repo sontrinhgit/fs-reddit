@@ -1,0 +1,8 @@
+query Me {
+    me {
+        ...userInfo
+    }
+}
+
+
+# //bat cu them mot code nao cua graphQL vao thi phai chay lai codegen de graphql codegen generator tao ra type tuong ung 

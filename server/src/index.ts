@@ -14,6 +14,8 @@ import { HelloResolver } from './resolvers/hello';
 import { PostResolver } from './resolvers/Post';
 import { UserResolver } from './resolvers/User';
 import { Context } from './types/Context';
+import cors from 'cors'
+import { ApolloServerPluginLandingPageGraphQLPlayground } from 'apollo-server-core';
 
 const main = async () => {
     await createConnection({
@@ -28,6 +30,11 @@ const main = async () => {
     })
 
     const app = express()
+
+    app.use(cors({
+        origin: 'http://localhost:3000',
+        credentials: true
+    }))
 
     //Session and Cookie Store 
 
@@ -64,7 +71,8 @@ const main = async () => {
             validate: false
             
         }),
-        context: ({ req, res }): Context => ({req,res})
+        context: ({ req, res }): Context => ({req,res}),
+        plugins: [ApolloServerPluginLandingPageGraphQLPlayground()]
         
     })
 

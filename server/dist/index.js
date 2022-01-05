@@ -27,6 +27,8 @@ const User_1 = require("./entities/User");
 const hello_1 = require("./resolvers/hello");
 const Post_2 = require("./resolvers/Post");
 const User_2 = require("./resolvers/User");
+const cors_1 = __importDefault(require("cors"));
+const apollo_server_core_1 = require("apollo-server-core");
 const main = () => __awaiter(void 0, void 0, void 0, function* () {
     yield (0, typeorm_1.createConnection)({
         type: 'postgres',
@@ -38,6 +40,10 @@ const main = () => __awaiter(void 0, void 0, void 0, function* () {
         entities: [User_1.User, Post_1.Post]
     });
     const app = (0, express_1.default)();
+    app.use((0, cors_1.default)({
+        origin: 'http://localhost:3000',
+        credentials: true
+    }));
     //Session and Cookie Store 
     const mongoUrl = `mongodb+srv://${process.env.SESSION_DB_USERNAME_DEV_PROD}:${process.env.SESSION_DB_PASSWORD_DEV_PROD}@reddit.b6kl0.mongodb.net/myFirstDatabase?retryWrites=true&w=majority`;
     yield mongoose_1.default.connect(mongoUrl, {});
@@ -61,7 +67,8 @@ const main = () => __awaiter(void 0, void 0, void 0, function* () {
             resolvers: [hello_1.HelloResolver, User_2.UserResolver, Post_2.PostResolver],
             validate: false
         }),
-        context: ({ req, res }) => ({ req, res })
+        context: ({ req, res }) => ({ req, res }),
+        plugins: [(0, apollo_server_core_1.ApolloServerPluginLandingPageGraphQLPlayground)()]
     });
     yield apolloServer.start();
     apolloServer.applyMiddleware({ app, cors: false });

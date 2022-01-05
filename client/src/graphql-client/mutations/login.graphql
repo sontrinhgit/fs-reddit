@@ -1,0 +1,9 @@
+# based on GraphQL docs
+mutation login($loginInput: LoginInput!) {
+  login(loginInput: $loginInput) {
+    ...userMutationResponse
+  }
+}
+
+
+# moi code duoc generate ra tu codegen deu phai duoc khai bao trong server va trong mutations

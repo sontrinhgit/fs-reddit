@@ -1,0 +1,6 @@
+# boi vi dang error la thuoc type FieldError nhu theo DOCS cua graphQl 
+
+fragment fieldError on FieldError {
+    field
+    message
+}

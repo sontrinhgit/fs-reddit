@@ -1,13 +1,13 @@
-import { Ctx, Query, Resolver } from "type-graphql";
-import { Context } from "../types/Context";
 
+import { Context } from '../types/Context'
+import { Ctx, Query, Resolver } from 'type-graphql'
 
 @Resolver()
 export class HelloResolver {
-  //String nay la String cua graphQL
-  @Query((_returns) => String)
-  hello(@Ctx() {req}: Context) {
-    console.log(req.session.userId);
-    return '123'
-  }
+	@Query(_returns => String)
+	hello(@Ctx() { req }: Context) {
+		const id = req.session.userId
+		console.log(id)
+		return 'hello world'
+	}
 }

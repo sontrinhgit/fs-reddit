@@ -15,14 +15,14 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.HelloResolver = void 0;
 const type_graphql_1 = require("type-graphql");
 let HelloResolver = class HelloResolver {
-    //String nay la String cua graphQL
     hello({ req }) {
-        console.log(req.session.userId);
-        return '123';
+        const id = req.session.userId;
+        console.log(id);
+        return 'hello world';
     }
 };
 __decorate([
-    (0, type_graphql_1.Query)((_returns) => String),
+    (0, type_graphql_1.Query)(_returns => String),
     __param(0, (0, type_graphql_1.Ctx)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [Object]),
