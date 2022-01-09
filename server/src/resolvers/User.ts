@@ -1,12 +1,18 @@
-import { Arg, Ctx, Mutation, Query, Resolver } from "type-graphql";
-import { User } from "../entities/User";
 import argon2 from "argon2";
-import { UserMutationResponse } from "../types/UserMutationResponse";
-import { RegisterInput } from "../types/RegisterInput";
-import { validateRegisterInput } from "../utils/validateRegisterInput";
-import { LoginInput } from "../types/LoginInput";
-import { Context } from "../types/Context";
+import { Arg, Ctx, Mutation, Query, Resolver } from "type-graphql";
 import { COOKIE_NAME } from "../constant";
+import { User } from "../entities/User";
+import { TokenModel } from "../models/token";
+import { Context } from "../types/Context";
+import { ForgotPasswordInput } from '../types/ForgotPassword';
+import { LoginInput } from "../types/LoginInput";
+import { RegisterInput } from "../types/RegisterInput";
+import { UserMutationResponse } from "../types/UserMutationResponse";
+import { sendEmail } from "../utils/sendEmail";
+import { validateRegisterInput } from "../utils/validateRegisterInput";
+import {v4 as uuidv4} from 'uuid'
+import { ChangePasswordInput } from "../types/ChangePasswordInput";
+
 @Resolver()
 export class UserResolver {
   //check the user have login or not
@@ -155,4 +161,128 @@ export class UserResolver {
       });
     });
   }
+
+
+  @Mutation(_return => Boolean)
+  async forgotPassword(@Arg('forgotPasswordInput') forgotPasswordInput: ForgotPasswordInput): Promise<boolean> {
+    const user = await User.findOne({email: forgotPasswordInput.email})
+    
+    if(!user) 
+    return true 
+
+    await TokenModel.findOneAndDelete({userId: `${user.id}`})
+
+   const resetToken = uuidv4()
+   //k duoc phep de lo ra token tran trui
+   //hash token giong nhu password
+
+   const hasedToken = await argon2.hash(resetToken)
+
+    await new TokenModel({userId: `${user.id}`, token: hasedToken}).save()
+    
+
+    //tra ve cho ng dung thi duoc phep tra token goc 
+    await sendEmail(forgotPasswordInput.email as string , `<a href='http://localhost:3000/change-password?token=${resetToken}&userId=${user.id}'>Click to here to change password</a>`)
+
+    return true
+  }
+
+  @Mutation(_return => UserMutationResponse)
+  async changePassword(
+    @Arg('token') token: string, 
+    @Arg('userId') userId: string,
+    @Arg('changePasswordInput',) changePasswordInput: ChangePasswordInput,
+    @Ctx() {req}: Context
+  ): Promise<UserMutationResponse> {
+    if(changePasswordInput.newPassword?.length <= 2) {
+      return {
+        code: 400,
+        success: false,
+        message: 'Invalid password',
+        errors: [
+          {
+            field: 'newPassword',
+            message: 'Length must be greater than 2'
+          }
+        ]
+      }
+    }
+
+    try {
+      //tim token ma trung voi cai userId do 
+      const resetPasswordTokenRecord = await TokenModel.findOne({userId})
+      if(!resetPasswordTokenRecord) {
+        return {
+          code: 400,
+          success: false,
+          message: 'Invalid or expired password reset token',
+          errors: [
+            {
+              field: 'token',
+              message: 'Invalid or expired token'
+            }
+          ]
+        }
+      }
+
+      //token nay chinh la token lay vao tu phia input ma ta truyen vao arg o tren 
+      const resetPasswordTokenValid = argon2.verify(resetPasswordTokenRecord.token, token)
+
+      if(!resetPasswordTokenValid)
+      return {
+        code: 400,
+        success: false,
+        message: 'Invalid or expired password reset token',
+        errors: [
+          {
+            field: 'token',
+            message: 'Invalid or expired token'
+          }
+        ]
+      }
+
+      //parseInt tai vi gia tri luu trong mongoDB la string nen can phai parseInt
+      const userIdNum = parseInt(userId)
+      const user = await User.findOne(userIdNum) //se tim hai cai id giong nhau o mongoDB va postgre
+
+      if(!user) 
+      return {
+        code: 400,
+        success: false,
+        message: 'User no longer available',
+        errors: [
+          {
+            field: 'user error',
+            message: 'User no longer exist'
+          }
+        ]
+      }
+
+      const updatedPassword = await argon2.hash(changePasswordInput.newPassword)
+
+      await User.update({id: userIdNum}, {password: updatedPassword})
+
+      await resetPasswordTokenRecord.deleteOne()
+
+      req.session.userId = user.id
+
+      return {
+        code: 200,
+        success: true,
+        message: 'User password reset successfully',
+       user: user
+      }
+
+    } catch (error) {
+      return {
+        code: 500,
+        success: false,
+        message: `Internal server error`,
+        
+      }
+    }
+  }
+
+
+
 }

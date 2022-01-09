@@ -25,14 +25,19 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.UserResolver = void 0;
-const type_graphql_1 = require("type-graphql");
-const User_1 = require("../entities/User");
 const argon2_1 = __importDefault(require("argon2"));
-const UserMutationResponse_1 = require("../types/UserMutationResponse");
-const RegisterInput_1 = require("../types/RegisterInput");
-const validateRegisterInput_1 = require("../utils/validateRegisterInput");
-const LoginInput_1 = require("../types/LoginInput");
+const type_graphql_1 = require("type-graphql");
 const constant_1 = require("../constant");
+const User_1 = require("../entities/User");
+const token_1 = require("../models/token");
+const ForgotPassword_1 = require("../types/ForgotPassword");
+const LoginInput_1 = require("../types/LoginInput");
+const RegisterInput_1 = require("../types/RegisterInput");
+const UserMutationResponse_1 = require("../types/UserMutationResponse");
+const sendEmail_1 = require("../utils/sendEmail");
+const validateRegisterInput_1 = require("../utils/validateRegisterInput");
+const uuid_1 = require("uuid");
+const ChangePasswordInput_1 = require("../types/ChangePasswordInput");
 let UserResolver = class UserResolver {
     //check the user have login or not
     me({ req }) {
@@ -155,6 +160,103 @@ let UserResolver = class UserResolver {
             });
         });
     }
+    forgotPassword(forgotPasswordInput) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const user = yield User_1.User.findOne({ email: forgotPasswordInput.email });
+            if (!user)
+                return true;
+            yield token_1.TokenModel.findOneAndDelete({ userId: `${user.id}` });
+            const resetToken = (0, uuid_1.v4)();
+            //k duoc phep de lo ra token tran trui
+            //hash token giong nhu password
+            const hasedToken = yield argon2_1.default.hash(resetToken);
+            yield new token_1.TokenModel({ userId: `${user.id}`, token: hasedToken }).save();
+            //tra ve cho ng dung thi duoc phep tra token goc 
+            yield (0, sendEmail_1.sendEmail)(forgotPasswordInput.email, `<a href='http://localhost:3000/change-password?token=${resetToken}&userId=${user.id}'>Click to here to change password</a>`);
+            return true;
+        });
+    }
+    changePassword(token, userId, changePasswordInput, { req }) {
+        var _a;
+        return __awaiter(this, void 0, void 0, function* () {
+            if (((_a = changePasswordInput.newPassword) === null || _a === void 0 ? void 0 : _a.length) <= 2) {
+                return {
+                    code: 400,
+                    success: false,
+                    message: 'Invalid password',
+                    errors: [
+                        {
+                            field: 'newPassword',
+                            message: 'Length must be greater than 2'
+                        }
+                    ]
+                };
+            }
+            try {
+                //tim token ma trung voi cai userId do 
+                const resetPasswordTokenRecord = yield token_1.TokenModel.findOne({ userId });
+                if (!resetPasswordTokenRecord) {
+                    return {
+                        code: 400,
+                        success: false,
+                        message: 'Invalid or expired password reset token',
+                        errors: [
+                            {
+                                field: 'token',
+                                message: 'Invalid or expired token'
+                            }
+                        ]
+                    };
+                }
+                //token nay chinh la token lay vao tu phia input ma ta truyen vao arg o tren 
+                const resetPasswordTokenValid = argon2_1.default.verify(resetPasswordTokenRecord.token, token);
+                if (!resetPasswordTokenValid)
+                    return {
+                        code: 400,
+                        success: false,
+                        message: 'Invalid or expired password reset token',
+                        errors: [
+                            {
+                                field: 'token',
+                                message: 'Invalid or expired token'
+                            }
+                        ]
+                    };
+                //parseInt tai vi gia tri luu trong mongoDB la string nen can phai parseInt
+                const userIdNum = parseInt(userId);
+                const user = yield User_1.User.findOne(userIdNum); //se tim hai cai id giong nhau o mongoDB va postgre
+                if (!user)
+                    return {
+                        code: 400,
+                        success: false,
+                        message: 'User no longer available',
+                        errors: [
+                            {
+                                field: 'user error',
+                                message: 'User no longer exist'
+                            }
+                        ]
+                    };
+                const updatedPassword = yield argon2_1.default.hash(changePasswordInput.newPassword);
+                yield User_1.User.update({ id: userIdNum }, { password: updatedPassword });
+                yield resetPasswordTokenRecord.deleteOne();
+                req.session.userId = user.id;
+                return {
+                    code: 200,
+                    success: true,
+                    message: 'User password reset successfully',
+                    user: user
+                };
+            }
+            catch (error) {
+                return {
+                    code: 500,
+                    success: false,
+                    message: `Internal server error`,
+                };
+            }
+        });
+    }
 };
 __decorate([
     (0, type_graphql_1.Query)((_return) => User_1.User, { nullable: true }),
@@ -186,6 +288,23 @@ __decorate([
     __metadata("design:paramtypes", [Object]),
     __metadata("design:returntype", Promise)
 ], UserResolver.prototype, "logout", null);
+__decorate([
+    (0, type_graphql_1.Mutation)(_return => Boolean),
+    __param(0, (0, type_graphql_1.Arg)('forgotPasswordInput')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [ForgotPassword_1.ForgotPasswordInput]),
+    __metadata("design:returntype", Promise)
+], UserResolver.prototype, "forgotPassword", null);
+__decorate([
+    (0, type_graphql_1.Mutation)(_return => UserMutationResponse_1.UserMutationResponse),
+    __param(0, (0, type_graphql_1.Arg)('token')),
+    __param(1, (0, type_graphql_1.Arg)('userId')),
+    __param(2, (0, type_graphql_1.Arg)('changePasswordInput')),
+    __param(3, (0, type_graphql_1.Ctx)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, String, ChangePasswordInput_1.ChangePasswordInput, Object]),
+    __metadata("design:returntype", Promise)
+], UserResolver.prototype, "changePassword", null);
 UserResolver = __decorate([
     (0, type_graphql_1.Resolver)()
 ], UserResolver);

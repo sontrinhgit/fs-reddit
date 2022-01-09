@@ -1,0 +1,1 @@
+{"version":3,"file":"checkAuth.js","sourceRoot":"","sources":["../../src/middleware/checkAuth.ts"],"names":[],"mappings":";;;;;;;;;;;;AAAA,2DAAyD;AAOlD,MAAM,SAAS,GAA0B,CAAO,EAAE,OAAO,EAAG,EAAC,GAAG,EAAC,EAAE,EAAE,IAAI,EAAE,EAAE;IACjF,IAAG,CAAC,GAAG,CAAC,OAAO,CAAC,MAAM;QACtB,MAAM,IAAI,wCAAmB,CAAC,gDAAgD,CAAC,CAAA;IAE/E,OAAO,IAAI,EAAE,CAAA;AACd,CAAC,CAAA,CAAC;AALS,QAAA,SAAS,aAKlB"}

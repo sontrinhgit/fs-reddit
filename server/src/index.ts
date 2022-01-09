@@ -16,6 +16,7 @@ import { UserResolver } from './resolvers/User';
 import { Context } from './types/Context';
 import cors from 'cors'
 import { ApolloServerPluginLandingPageGraphQLPlayground } from 'apollo-server-core';
+import { sendEmail } from './utils/sendEmail';
 
 const main = async () => {
     await createConnection({
@@ -28,6 +29,8 @@ const main = async () => {
         entities: [User, Post]
 
     })
+
+   
 
     const app = express()
 

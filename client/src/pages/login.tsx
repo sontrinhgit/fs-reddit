@@ -1,4 +1,4 @@
-import { Box, Button, Flex, FormControl, Spinner } from "@chakra-ui/react";
+import { Box, Button, Flex, FormControl, Link, Spinner, useToast } from "@chakra-ui/react";
 import { Form, Formik, FormikHelpers } from "formik";
 import { useRouter } from "next/router";
 import InputField from "../components/InputField";
@@ -11,9 +11,13 @@ import {
 } from "../generated/graphql";
 import { mapFieldErrors } from "../helpers/mapFieldErrors";
 import { useCheckAuth } from "../utils/useCheckAuth";
+import NextLink from 'next/link'
+
 
 const Login = () => {
   const router = useRouter();
+
+  const toast = useToast()
 
   const { data: authData, loading: authLoading } = useCheckAuth();
 
@@ -50,7 +54,15 @@ const Login = () => {
     if (response.data?.login.errors) {
       setErrors(mapFieldErrors(response.data.login.errors));
     } else if (response.data?.login?.user) {
-      //register successfully
+      //login successfully
+      //dat toast len day thi toast se duoc load len truoc khi router push sang / 
+      toast({
+        title: 'Welcome',
+        description: `${response.data.login.user.username}`,
+        status: 'success',
+        duration: 3000,
+        isClosable: true
+      })
       router.push("/");
     }
   };
@@ -65,9 +77,7 @@ const Login = () => {
       ) : (
         <Wrapper>
           {error && <p>Fail to login. Internal server error</p>}
-          {data && data.login.success && (
-            <p>Login successfully {JSON.stringify(data)}</p>
-          )}
+          
           <Formik initialValues={initialValue} onSubmit={onLoginSubmit}>
             {/* Formik tra ve mot function, trong function do co chua values la children  */}
             {/* handleChange la ham helper co san o trong Formik  */}
@@ -88,6 +98,12 @@ const Login = () => {
                       type="password"
                     />
                   </Box>
+
+                <Flex mt={2}>
+                  <NextLink href='/forgot-password'>
+                    <Link ml='auto'> Forgot password</Link>
+                  </NextLink>
+                </Flex>
 
                   <Button
                     type="submit"

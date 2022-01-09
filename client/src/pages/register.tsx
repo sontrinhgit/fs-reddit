@@ -6,6 +6,7 @@ import {
   FormLabel,
   Input,
   Spinner,
+  useToast,
 } from "@chakra-ui/react";
 import { Formik, Form, FormikHelpers } from "formik";
 import Wrapper from "../components/Wrapper";
@@ -23,6 +24,8 @@ import { useCheckAuth } from "../utils/useCheckAuth";
 
 const Register = () => {
   const router = useRouter();
+
+  const toast = useToast()
 
   const { data: authData, loading: authLoading } = useCheckAuth();
 
@@ -53,6 +56,13 @@ const Register = () => {
       setErrors(mapFieldErrors(response.data.register.errors));
     } else if (response.data?.register?.user) {
       //register successfully
+      toast({
+        title: 'Welcome',
+        description: `${response.data.register.user.username}`,
+        status: 'success',
+        duration: 3000,
+        isClosable: true
+      })
       router.push("/");
     }
   };
@@ -66,7 +76,7 @@ const Register = () => {
       ) : (
         <Wrapper>
           {error && <p>Fail to register</p>}
-          {data && <p>Register successfully {JSON.stringify(data)}</p>}
+          
           <Formik initialValues={initialValue} onSubmit={onRegisterSubmit}>
             {/* Formik tra ve mot function, trong function do co chua values la children  */}
             {/* handleChange la ham helper co san o trong Formik  */}

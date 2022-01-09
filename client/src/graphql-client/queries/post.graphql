@@ -1,0 +1,11 @@
+query Posts {
+  posts{
+    id
+    title
+    text
+    createdAt
+    updatedAt
+  }
+}
+
+# anytime have new code from graphql remember to run codegen 
