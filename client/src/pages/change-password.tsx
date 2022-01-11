@@ -8,7 +8,7 @@ import {
 } from "@chakra-ui/react";
 import { Form, Formik, FormikHelpers } from 'formik';
 import NextLink from "next/link";
-import Router, { useRouter } from "next/router";
+import { useRouter } from "next/router";
 import React, { useState } from "react";
 import InputField from "../components/InputField";
 import Wrapper from "../components/Wrapper";

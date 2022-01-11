@@ -7,7 +7,6 @@ import { useCheckAuth } from "../utils/useCheckAuth";
 import {
   useCreatePostMutation,
   CreatePostInput,
-  PaginatedPosts,
 } from "../generated/graphql";
 import router from "next/router";
 

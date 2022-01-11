@@ -1,6 +1,6 @@
 import { useMemo } from 'react'
 import { ApolloClient, HttpLink, InMemoryCache, NormalizedCacheObject } from '@apollo/client'
-import { concatPagination } from '@apollo/client/utilities'
+
 import merge from 'deepmerge'
 import isEqual from 'lodash/isEqual'
 import { Post } from '../generated/graphql'
@@ -17,7 +17,7 @@ function createApolloClient() {
   return new ApolloClient({
     ssrMode: typeof window === 'undefined',
     link: new HttpLink({
-      uri: 'http://localhost:4000/graphql', // Server URL (must be absolute)
+      uri: process.env.NODE_ENV === 'production' ? 'https://vast-coast-50715.herokuapp.com/graphql' : 'http://localhost:4000/graphql', // Server URL (must be absolute)
       credentials: 'include', // Additional fetch() options like `credentials` or `headers`
     }),
     cache: new InMemoryCache({

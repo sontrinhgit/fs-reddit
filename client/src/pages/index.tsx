@@ -3,14 +3,14 @@ import { Box, Button, Flex, Heading, Link, Spinner, Stack, Text } from "@chakra-
 import NextLink from 'next/link';
 import Layout from "../components/Layout";
 import PostEditDeleteButton from "../components/PostEditDeleteButton";
-import { PostsDocument, usePostsQuery, useMeQuery } from '../generated/graphql';
+import { PostsDocument, usePostsQuery } from '../generated/graphql';
 import { addApolloState, initializeApollo } from "../lib/apolloClient";
 
 export const limit = 3
 
 const Index = () => {
   //vi gia tri limit truyen vao la gia tri bat buoc
-  const { data, loading, error, fetchMore, networkStatus } = usePostsQuery({variables: {limit}, 
+  const { data, loading, fetchMore, networkStatus } = usePostsQuery({variables: {limit}, 
     //component nao render boi Posts query nay thi se rerender khi networkStatusChange thay doi, tuc la fetch more
     //fetchMore chi la ham goi lai chinh query nay
     //ap dung vao loadMore, khi do fetchMore se goi lai query mot lan nua

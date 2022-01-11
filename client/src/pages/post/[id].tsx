@@ -6,10 +6,9 @@ import {
   Button,
   Flex,
   Heading,
-  IconButton,
   Spinner,
 } from "@chakra-ui/react";
-import { GetStaticProps } from "next";
+
 import { useRouter } from "next/router";
 import React from "react";
 import Layout from "../../components/Layout";
@@ -23,8 +22,8 @@ import {
 import { addApolloState, initializeApollo } from "../../lib/apolloClient";
 import { limit } from "../index";
 import NextLink from "next/link";
-import { EditIcon } from "@chakra-ui/icons";
-import PostEditDeleteButton from '../../components/PostEditDeleteButton';
+import { GetStaticProps } from 'next';
+
 
 const Post = () => {
   const router = useRouter();

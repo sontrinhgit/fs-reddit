@@ -2,7 +2,7 @@ import React from 'react'
 import { useMeQuery, useOnePostQuery, useUpdatePostMutation, UpdatePostInput } from '../../../generated/graphql';
 import { useRouter } from 'next/router';
 import Layout from '../../../components/Layout';
-import { Alert, AlertIcon, AlertTitle, Box, Button, Flex, FormControl, Link, Spinner } from '@chakra-ui/react';
+import { Alert, AlertIcon, AlertTitle, Box, Button, Flex, FormControl, Spinner } from '@chakra-ui/react';
 import NextLink from 'next/link'
 import { Form, Formik } from 'formik';
 import InputField from '../../../components/InputField';

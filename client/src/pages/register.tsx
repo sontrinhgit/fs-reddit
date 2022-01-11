@@ -3,8 +3,6 @@ import {
   Button,
   Flex,
   FormControl,
-  FormLabel,
-  Input,
   Spinner,
   useToast,
 } from "@chakra-ui/react";
@@ -14,8 +12,7 @@ import InputField from "../components/InputField";
 import {
   MeDocument,
   RegisterInput,
-  useRegisterMutation,
-  UserMutationResponse,
+  useRegisterMutation
 } from "../generated/graphql";
 import { mapFieldErrors } from "../helpers/mapFieldErrors";
 import { useRouter } from "next/router";
@@ -31,7 +28,7 @@ const Register = () => {
 
   const initialValue: RegisterInput = { username: "", email: "", password: "" };
 
-  const [registerUser, { data, loading: _registerUserLoading, error }] =
+  const [registerUser, {loading: _registerUserLoading, error }] =
     useRegisterMutation();
 
   const onRegisterSubmit = async (
