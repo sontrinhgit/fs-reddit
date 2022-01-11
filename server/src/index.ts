@@ -3,7 +3,7 @@ import { ApolloServer } from 'apollo-server-express';
 import MongoStore from 'connect-mongo';
 import express from 'express';
 import session from 'express-session';
-import mongoose from 'mongoose';
+import mongoose, { connection } from 'mongoose';
 import 'reflect-metadata';
 import { buildSchema } from 'type-graphql';
 import { createConnection } from 'typeorm';
@@ -17,25 +17,41 @@ import { Context } from './types/Context';
 import cors from 'cors'
 import { ApolloServerPluginLandingPageGraphQLPlayground } from 'apollo-server-core';
 import { sendEmail } from './utils/sendEmail';
+import path from 'path';
 
 const main = async () => {
-    await createConnection({
+    const connection = await createConnection({
         type: 'postgres',
-        database: 'reddit',
+        ...(__prod__ ? {url: process.env.DATABASE_URL}: { database: 'reddit',
         username: process.env.DB_USERNAME_DEV,
-        password: process.env.DB_PASSWORD_DEV,
+        password: process.env.DB_PASSWORD_DEV,} ),
+       
         logging: true,
-        synchronize: true, //tu dong lay model roi uplen database thi se kp chay migration 
-        entities: [User, Post]
+        //connection de ket noi voi DB khi Deploy
+        ...(__prod__ ? {
+            extra: {
+                ssl: {
+                    rejectUnauthorized: false
+                }
+            }, ssl: true
+        } : {}),
+        //khi ma viet code thi de la true
+        //khi deploy len phai tao mot DB moi de viet SQL len do 
+        //trong moi truong dev se chay synchronize: true
+        ...(__prod__ ? {} :{ synchronize: true}), //tu dong lay model roi uplen database thi se kp chay migration 
+        entities: [User, Post],
+        migrations: [path.join(__dirname, '/migrations/*')]
 
     })
 
+    //trong moi truong product se chay la connection.runMigrations => chui vao migration folder va chay SQL trong folder do 
+    if (__prod__) await connection.runMigrations()
    
 
     const app = express()
 
     app.use(cors({
-        origin: 'http://localhost:3000',
+        origin: __prod__ ? process.env.CORS_ORIGIN_PROD :  process.env.CORS_ORIGIN_DEV,
         credentials: true
     }))
 
@@ -56,7 +72,8 @@ const main = async () => {
             maxAge: 1000 * 60 * 60, //one hour
             httpOnly: true, //JS frondend can not access the cookie
             secure: __prod__ ,    //cookie only works in HTTPS
-            sameSite: 'none' ,//protection against CSRF
+            sameSite: 'lax' ,//protection against CSRF,
+            domain: __prod__ ? '.vercel.app' : undefined
 
         },
         secret: process.env.SESSION_SECRET_DEV_PROD as string,
