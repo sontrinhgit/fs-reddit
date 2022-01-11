@@ -74,7 +74,7 @@ const Register = () => {
           <Spinner />
         </Flex>
       ) : (
-        <Wrapper>
+        <Wrapper size='small'>
           {error && <p>Fail to register</p>}
           
           <Formik initialValues={initialValue} onSubmit={onRegisterSubmit}>

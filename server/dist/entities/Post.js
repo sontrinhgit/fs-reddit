@@ -12,6 +12,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.Post = void 0;
 const type_graphql_1 = require("type-graphql");
 const typeorm_1 = require("typeorm");
+const User_1 = require("./User");
 //if want to talk with graphQl so need objectType()
 let Post = class Post extends typeorm_1.BaseEntity {
 };
@@ -26,18 +27,32 @@ __decorate([
     __metadata("design:type", String)
 ], Post.prototype, "title", void 0);
 __decorate([
+    (0, type_graphql_1.Field)({ nullable: true }),
+    (0, typeorm_1.Column)({ nullable: true }),
+    __metadata("design:type", Number)
+], Post.prototype, "userId", void 0);
+__decorate([
+    (0, type_graphql_1.Field)(_type => User_1.User)
+    //k tao ra column, postgresql se mo ra mot foreignKey de noi tu post nay sang user 
+    ,
+    (0, typeorm_1.ManyToOne)(() => User_1.User, user => user.posts),
+    __metadata("design:type", User_1.User)
+], Post.prototype, "user", void 0);
+__decorate([
     (0, type_graphql_1.Field)(_type => String),
     (0, typeorm_1.Column)(),
     __metadata("design:type", String)
 ], Post.prototype, "text", void 0);
 __decorate([
     (0, type_graphql_1.Field)(_type => Date),
-    (0, typeorm_1.CreateDateColumn)(),
+    (0, typeorm_1.CreateDateColumn)({ type: 'timestamptz' }) //de so sanh xem post nao post truoc post sau 
+    ,
     __metadata("design:type", Object)
 ], Post.prototype, "createdAt", void 0);
 __decorate([
     (0, type_graphql_1.Field)(_type => Date),
-    (0, typeorm_1.CreateDateColumn)(),
+    (0, typeorm_1.CreateDateColumn)({ type: 'timestamptz' }) //timestampt with timezone, Dedault Date is time without timezone
+    ,
     __metadata("design:type", Object)
 ], Post.prototype, "updatedAt", void 0);
 Post = __decorate([

@@ -1,0 +1,9 @@
+
+# postIds nay chi de lay 3 cai id dau tien ma thoi
+query PostIds($limit: Int!, $cursor: String) {
+    posts(limit: $limit, cursor: $cursor) {
+        paginatedPosts {
+            id
+        }
+    }
+}

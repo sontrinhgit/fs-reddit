@@ -1,0 +1,8 @@
+query onePost($id: ID!) {
+    post(id: $id) {
+        id
+        title
+        text
+        userId
+    }
+}

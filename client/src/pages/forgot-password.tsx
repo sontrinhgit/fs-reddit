@@ -31,7 +31,7 @@ const ForgotPassword = () => {
     );
   } else
     return (
-      <Wrapper>
+      <Wrapper size='small'>
         <Formik initialValues={initialValues} onSubmit={onForgotPasswordSubmit}>
           {/* Formik tra ve mot function, trong function do co chua values la children  */}
           {/* handleChange la ham helper co san o trong Formik  */}

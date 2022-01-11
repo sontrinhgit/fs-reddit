@@ -4,8 +4,10 @@ import {
   Column,
   CreateDateColumn,
   Entity,
+  OneToMany,
   PrimaryGeneratedColumn,
 } from "typeorm";
+import { Post } from "./Post";
 
 @ObjectType()
 //object type la de noi chuyen voi graphql 
@@ -23,11 +25,16 @@ export class User extends BaseEntity {
   //column goi la decorator, unique la nhung cai option se past vao decorator do
     @Field(_type => String)
   @Column({ unique: true })
-  username!: string;
+  username!: string; 
 
   //password k tra ve vi can phai private 
   @Column()
   password!: string;
+
+
+  //Khai bao de noi 2 database voi nhau 
+  @OneToMany(()=> Post, post => post.user)
+  posts: Post[] 
 
   @Field()
   @Column({ unique: true })

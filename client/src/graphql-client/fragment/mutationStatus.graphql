@@ -3,3 +3,9 @@ fragment mutationStatuses on UserMutationResponse {
     success
     message
 }
+
+fragment postMutationStatus on PostMutationResponse {
+    code
+    success
+    message
+}

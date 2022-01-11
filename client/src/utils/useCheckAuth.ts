@@ -11,18 +11,23 @@ export const useCheckAuth = () => {
 
   //co nghia la k co loading nhung user da login vao roi thi se k truy cap duoc vao trang do nua va tro ve trang chu automatic 
   useEffect(() => {
-    if (
-      !loading &&
-      data?.me &&
-      (router.route === "/login" ||
-        router.route === "/register" ||
-        router.route === "/forgot-password" ||
-        router.route === "/change-password")
-    ) {
-      //neu thoa man cac gia tri tren thi se dua ve trang chu
-      router.replace("/");
+    if(!loading) {
+      if (
+      
+        data?.me &&
+        (router.route === "/login" ||
+          router.route === "/register" ||
+          router.route === "/forgot-password" ||
+          router.route === "/change-password")
+      ) {
+        //neu thoa man cac gia tri tren thi se dua ve trang chu
+        router.replace("/");
+      } else if (!data?.me && router.route !== "/login") //neu nhu ng dung ma chua login {
+        router.replace("/login")
+      }
     }
-  }, [data, loading, router]);
+    
+  , [data, loading, router]);
 
   return { data, loading };
 };
