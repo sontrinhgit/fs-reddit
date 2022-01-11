@@ -22,7 +22,7 @@ export const useCheckAuth = () => {
       ) {
         //neu thoa man cac gia tri tren thi se dua ve trang chu
         router.replace("/");
-      } else if (!data?.me && router.route !== "/login") //neu nhu ng dung ma chua login {
+      } else if (!data?.me && router.route !== "/login" && router.route !== "/register") //neu nhu ng dung ma chua login {
         router.replace("/login")
       }
     }
