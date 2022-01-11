@@ -70,7 +70,7 @@ const Post = () => {
         <Heading mb={4}>{data.post.title}</Heading>
         <Box mb={4}>{data.post.text}</Box>
         <Flex mt={4} justifyContent='space-between' alignItems='center' >
-        <PostEditDeleteButton postId={data.post.id} postUserId={data.post.userId?.toString()} />
+       
           <NextLink href="/">
             <Button>Go back home page</Button>
           </NextLink>
